@@ -8,25 +8,17 @@ def index():
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    num1 = float(request.form['num1'])
-    operator = request.form['operator']
-    num2 = float(request.form['num2'])
-
-    if operator == '+':
-        result = num1 + num2
-    elif operator == '-':
-        result = num1 - num2
-    elif operator == '*':
-        result = num1 * num2
-    elif operator == '/':
-        if num2 != 0:
-            result = num1 / num2
-        else:
-            return jsonify({'error': 'Division by zero'}), 400
+    if request.is_json:
+        try:
+            data = request.get_json()
+            num1 = data['num1']
+            num2 = data['num2']
+            result = num1 + num2
+            return jsonify({'result': result})
+        except Exception as e:
+            return jsonify({'error': str(e)})
     else:
-        return jsonify({'error': 'Invalid operator'}), 400
-
-    return jsonify({'result': result})
+        return jsonify({'error': 'Invalid request'}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+        app.run(host='0.0.0.0', port=5000, debug=False)
